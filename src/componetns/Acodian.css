@@ -1,0 +1,27 @@
+.acordian-header {
+  width: 50%;
+  margin: 50px auto;
+  display: flex;
+  justify-content: space-between;
+  background-color: antiquewhite;
+  padding: 10px;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.acordian-button {
+  border: none;
+  outline: none;
+  background-color: antiquewhite;
+  font-size: 20px;
+}
+.accodian-description {
+  width: 50%;
+  margin: 0 auto;
+  margin-top: -50px;
+  display: flex;
+  justify-content: space-between;
+  background-color: aqua;
+  padding: 0px;
+  transition: all 1s ease;
+}

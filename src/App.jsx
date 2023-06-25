@@ -1,35 +1,74 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import axios, { CanceledError } from "axios";
+import React, { useState, useEffect } from "react";
 
-function App() {
-  const [count, setCount] = useState(0)
+const App = () => {
+  const [user, SetUser] = useState([]);
+  const [error, SetError] = useState("");
+  const [loading, SetLoading] = useState(false);
+
+  useEffect(function () {
+    const controller = new AbortController();
+    SetLoading(true);
+    axios
+      .get("https://jsonplaceholder.typicode.com/albums", {
+        signal: controller.signal,
+      })
+      .then((res) => {
+        console.log(res.data);
+        SetUser(res.data);
+        SetLoading(false);
+      })
+      .catch((err) => {
+        {
+          if (err instanceof CanceledError) return;
+          SetError(err.message);
+          SetLoading(false);
+        }
+      });
+    return () => controller.abort();
+  }, []);
+
+  const deleteUser = (id) => {
+    const original = [...user];
+    SetUser(user.filter((e) => e.id !== id));
+    axios
+      .delete("https://jsonplaceholder.typicode.com/asdasdalbums/" + id)
+      .catch((err) => {
+        SetError(err.message);
+        SetUser(original);
+      });
+  };
 
   return (
-    <>
-      <div>
-        <a href="https://vitejs.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.jsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
-  )
-}
+    <div>
+      {loading && (
+        <div>
+          <div class="d-flex justify-content-center">
+            <div class="spinner-border" role="status">
+              <span class="visually-hidden">Loading...</span>
+            </div>
+          </div>
+        </div>
+      )}
+      {error && <p className="text-danger">{error}</p>}
 
-export default App
+      <ul>
+        {user.map((user) => (
+          <li key={user.id} className="d-flex justify-content-between m-2">
+            {user.title}
+            <button
+              className="btn btn-outline-danger"
+              onClick={() => {
+                deleteUser(user.id);
+              }}
+            >
+              Delete
+            </button>
+          </li>
+        ))}
+      </ul>
+    </div>
+  );
+};
+
+export default App;
